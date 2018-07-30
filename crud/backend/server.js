@@ -26,13 +26,18 @@ mongodb.MongoClient.connect(dbUrl,{ useNewUrlParser:true },(err, client) => {
             res.json({ games })
         })
     })
+    .get('/api/games/:_id', (req, res) => {
+        db.collection('games').findOne({_id: new mongodb.ObjectId(req.params._id)},(err, game) => {
+            res.json({game})
+        })
+    })
     .post('/api/games', (req, res) => {
         const { errors, isValid } = validate(req.body)
         if(isValid){
             const { title, cover } = req.body
             db.collection('games').insert({title, cover}, (err, result) => {
                 if(err){
-                    res.status(500).json({errors: 'Something went wrong!'})
+                    res.status(500).json({errors:{global: 'Something went wrong!'}})
                 }else{
                     res.json({ game: result.ops[0] })
                 }

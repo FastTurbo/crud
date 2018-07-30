@@ -26,6 +26,7 @@ ReactDOM.render(
                 <Route exact path="/" component={App}/>
                 <Route exact path="/games" component={ GamesPage } />
                 <Route path="/games/new" component={ GamesForm } />
+                <Route path="/game/:_id" component={ GamesForm } />
             </div>
         </Router>
     </Provider>,

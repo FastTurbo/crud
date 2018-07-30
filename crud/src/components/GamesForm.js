@@ -1,15 +1,34 @@
 import React, { Component } from 'react'
 import classnames from 'classnames'
 import {connect} from 'react-redux'
-import { saveGame } from '../actions'
+import { saveGame, fetchGame } from '../actions'
+import { Redirect } from 'react-router-dom'
 
 class GamesForm extends Component {
     state = {
-        title:'',
-        cover:'',
+        title: this.props.game ? this.props.game.title : '',
+        cover: this.props.game ? this.props.game.cover : '',
+        _id:this.props.game ? this.props.game._id : '',
         errors:{},
-        loading:false
+        loading:false,
+        done:false
     }
+
+    componentDidMount() {
+        const { match } = this.props
+        if(match.params._id){
+            this.props.fetchGame(match.params._id)
+        }
+    }
+
+    componentWillReceiveProps = (nextProps) => {
+      this.setState({
+          _id : nextProps.game._id,
+          title : nextProps.game.title,
+          cover : nextProps.game.cover
+      })
+    }
+    
 
     handleChange = (e) => {
         if(!! this.state.errors[e.target.name]){
@@ -38,15 +57,16 @@ class GamesForm extends Component {
             const { title, cover} = this.state;
             this.setState({loading:true})
             this.props.saveGame({title, cover})
-            .then(() => {},
+            .then(() => {
+                this.setState({ done:true })
+            },
             (err) => err.response.json().then(({ errors }) => { this.setState({errors,loading:false})}))
         }
 
     }
   render() {
-    return (
-      <div>
-        <form className={ classnames('ui','form',{ loading: this.state.loading })} onSubmit={this.handleSubmit}>
+      const form = (
+          <form className={ classnames('ui','form',{ loading: this.state.loading })} onSubmit={this.handleSubmit}>
             <h1>Add New Game</h1>
             { !!this.state.errors.global && <div className="ui negative message">{ this.state.errors.global }</div>}
             <div className={ classnames('field',{ error:!!this.state.errors.title })}>
@@ -60,17 +80,33 @@ class GamesForm extends Component {
                 <span>{ this.state.errors.cover }</span>
             </div>
 
-            <div className="field">
-                { this.state.cover !== '' && <img src={ this.state.cover} alt="cover" className="ui small bordered image"/>}
-            </div>
+            
 
             <div className="filed">
                 <button className="ui primary button">Save</button>
             </div>
         </form>
+      )
+    return (
+      <div>
+        { this.state.done ? <Redirect to="/games" /> : form }
       </div>
     )
   }
 }
 
-export default connect(null,{ saveGame })(GamesForm)
+const mapStateToProps = (state, props) => {
+    const { match } = props
+    if(match.params._id){
+        return {
+            game:state.games.find(item => item._id === match.params._id)
+        }
+    }else{
+        return {game:null}
+    }
+}
+
+export default connect(mapStateToProps, {
+    saveGame,
+    fetchGame
+})(GamesForm)
