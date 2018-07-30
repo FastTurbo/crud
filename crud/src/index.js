@@ -23,8 +23,8 @@ ReactDOM.render(
                     <NavLink exact activeClassName="active" className="item" to="/games">Games</NavLink>
                     <NavLink activeClassName = "active" className = "item" to = "/games/new" > Add New Game </NavLink>
                 </div> 
-                <Route path="/" component={App}/>
-                <Route path="/games" component={ GamesPage } />
+                <Route exact path="/" component={App}/>
+                <Route exact path="/games" component={ GamesPage } />
                 <Route path="/games/new" component={ GamesForm } />
             </div>
         </Router>
