@@ -102,7 +102,7 @@ const mapStateToProps = (state, props) => {
             game:state.games.find(item => item._id === match.params._id)
         }
     }else{
-        return {game:null}
+        return { game:null }
     }
 }
 
