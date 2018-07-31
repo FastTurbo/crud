@@ -1,8 +1,5 @@
 import React, { Component } from 'react'
 import classnames from 'classnames'
-import {connect} from 'react-redux'
-import { saveGame, fetchGame } from '../actions'
-import { Redirect } from 'react-router-dom'
 
 class GamesForm extends Component {
     state = {
@@ -10,24 +7,17 @@ class GamesForm extends Component {
         cover: this.props.game ? this.props.game.cover : '',
         _id:this.props.game ? this.props.game._id : '',
         errors:{},
-        loading:false,
-        done:false
+        loading:false
     }
 
-    componentDidMount() {
-        const { match } = this.props
-        if(match.params._id){
-            this.props.fetchGame(match.params._id)
-        }
-    }
-
-    componentWillReceiveProps = (nextProps) => {
-      this.setState({
-          _id : nextProps.game._id,
-          title : nextProps.game.title,
-          cover : nextProps.game.cover
-      })
-    }
+    // componentWillReceiveProps = (nextProps) => {
+    //     console.log(nextProps)
+    //   this.setState({
+    //       _id : nextProps.game._id,
+    //       title : nextProps.game.title,
+    //       cover : nextProps.game.cover
+    //   })
+    // }
     
 
     handleChange = (e) => {
@@ -54,13 +44,9 @@ class GamesForm extends Component {
         
         const isValid = Object.keys(errors).length === 0
         if(isValid){
-            const { title, cover} = this.state;
-            this.setState({loading:true})
-            this.props.saveGame({title, cover})
-            .then(() => {
-                this.setState({ done:true })
-            },
-            (err) => err.response.json().then(({ errors }) => { this.setState({errors,loading:false})}))
+            const { _id,title, cover} = this.state
+            this.props.saveGame({_id, title, cover})
+            .catch(err => err.response.json().then(({ errors }) => this.setState({ errors, loading: false})))
         }
 
     }
@@ -80,8 +66,6 @@ class GamesForm extends Component {
                 <span>{ this.state.errors.cover }</span>
             </div>
 
-            
-
             <div className="filed">
                 <button className="ui primary button">Save</button>
             </div>
@@ -89,24 +73,10 @@ class GamesForm extends Component {
       )
     return (
       <div>
-        { this.state.done ? <Redirect to="/games" /> : form }
+        { form }
       </div>
     )
   }
 }
 
-const mapStateToProps = (state, props) => {
-    const { match } = props
-    if(match.params._id){
-        return {
-            game:state.games.find(item => item._id === match.params._id)
-        }
-    }else{
-        return { game:null }
-    }
-}
-
-export default connect(mapStateToProps, {
-    saveGame,
-    fetchGame
-})(GamesForm)
+export default GamesForm
