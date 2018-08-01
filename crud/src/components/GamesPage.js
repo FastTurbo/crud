@@ -1,21 +1,22 @@
 import React, { Component } from 'react'
-import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 import GamesList from './GamesList'
 import { fetchGames, deleteGame } from '../actions'
 
+export class GamesPage extends Component {
 
-class GamesPage extends Component {
-
-
-  componentDidMount(){
-    this.props.fetchGames()
-  }
+    componentDidMount() {
+        this.props.fetchGames()
+    }
+  
 
   render() {
+    let { games, deleteGame } = this.props
     return (
+        
       <div>
-        <GamesList games={ this.props.games } deleteGame={ this.props.deleteGame }></GamesList>
+        <GamesList games={ games } deleteGame={ deleteGame }/>
       </div>
     )
   }
@@ -23,8 +24,7 @@ class GamesPage extends Component {
 
 GamesPage.propTypes = {
     games:PropTypes.array.isRequired,
-    fetchGames:PropTypes.func.isRequired,
-    deleteGame:PropTypes.func.isRequired,
+    deleteGame:PropTypes.func.isRequired
 }
 
 const mapStateToProps = state => {
@@ -33,4 +33,4 @@ const mapStateToProps = state => {
     }
 }
 
-export default connect(mapStateToProps, { fetchGames,deleteGame })(GamesPage)
+export default connect(mapStateToProps,{ fetchGames, deleteGame })(GamesPage)
