@@ -1,16 +1,9 @@
+import { SET_GAMES, ADD_GAME, GAME_FETCHED, GAME_UPDATED, GAME_DELETED } from "../constants";
 
-import { SET_GAMES, GAME_FETCHED, ADD_GAME, GAME_UPDATED, GAME_DELETED } from '../constants/index';
-export const setGames = games => {
+const setGames = games => {
     return {
         type: SET_GAMES,
         games
-    }
-}
-
-export const gameFetched = game => {
-    return {
-        type: GAME_FETCHED,
-        game
     }
 }
 
@@ -22,37 +15,41 @@ export const fetchGames = () => {
     }
 }
 
+const gameFetched = game => {
+    return {
+        type: GAME_FETCHED,
+        game
+    }
+}
+
 export const fetchGame = id => {
     return dispatch => {
         fetch(`/api/games/${id}`)
-        .then(res => res.json())
-        .then(data => dispatch(gameFetched(data.game)))
+            .then(res => res.json())
+            .then(data => dispatch(gameFetched(data.game)))
     }
 }
 
-
-const handleResponse = response => {
-    if(response.ok){
-        return response.json()
+const handleResponse = res => {
+    if(res.ok){
+        return res.json()
     }else{
-        let error = new Error(response.statusText)
-        error.response = response
-        throw error
+        return new Error(res)
     }
 }
 
-export const addGame = game => {
+const addGame = game => {
     return {
         type: ADD_GAME,
         game
     }
 }
 
-export const saveGame = data => {
+export const saveGames = game => {
     return dispatch => {
         return fetch('/api/games', {
             method:'post',
-            body:JSON.stringify(data),
+            body:JSON.stringify(game),
             headers:{
                 'Content-Type':'application/json'
             }
@@ -68,29 +65,30 @@ const gameUpdated = game => {
     }
 }
 
-export const updateGame = data => {
+export const updateGames = game => {
     return dispatch => {
-        return fetch(`/api/games/${data._id}`, {
+        return fetch(`/api/games/${ game._id }`, {
             method:'put',
-            body:JSON.stringify(data),
+            body:JSON.stringify(game),
             headers:{
                 'Content-Type':'application/json'
             }
-        }).then(handleResponse)
+        })
+        .then(handleResponse)
         .then(data => dispatch(gameUpdated(data.game)))
     }
 }
 
-const gameDeleted = gameId => {
+const gameDeleted = id => {
     return {
         type: GAME_DELETED,
-        gameId
+        id
     }
 }
 
 export const deleteGame = id => {
     return dispatch => {
-        return fetch(`/api/games/${id}`, {
+        return fetch(`/api/games/${ id }`, {
             method:'delete',
             headers:{
                 'Content-Type':'application/json'

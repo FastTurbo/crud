@@ -33,7 +33,7 @@ mongodb.MongoClient.connect(dbUrl,{ useNewUrlParser:true },(err, client) => {
     })
     .put('/api/games/:_id', (req,res) => {
         const { errors, isValid } = validate(req.body)
-
+        console.log(req.body)
         if(isValid){
             const { title,cover } = req.body
             db.collection('games').findOneAndUpdate(
